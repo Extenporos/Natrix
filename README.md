@@ -38,7 +38,7 @@ Default location:
 ~/.natrix/envs/<environment_name>/
 
 
-Structure:
+**Structure:**
 
 
 metadata.json
@@ -78,7 +78,7 @@ The Natrixfile is parsed and compiled into structured metadata before execution.
 
 
 ---
-Alpha Features (0.0.1)
+**Alpha Features (0.0.1)**
 
 - Environment creation
 - Metadata generation
@@ -88,74 +88,39 @@ Alpha Features (0.0.1)
 - Manual activation (venv-style)
 - Export to .natenv (reproducible archive format)
 - Backend System
-- Alpha backend:
+
+---
+**Alpha backend:**
 - pip (internal usage)
 - Runtime reuse (system Python / venv style)
 
 ---  
-Future backend:
-
-Native dependency resolver
-
-Rust-powered components
-
-Export Format (.natenv)
-
-.natenv is a reproducible archive format containing:
-
-manifest.json
-
-metadata.json
-
-natrix.lock
-
-Natrixfile
-
-checksums
-
+**Future backend:**
+- Native dependency resolver, Rust-powered components, export Format (.natenv)
+- ```.natenv``` is a reproducible archive format containing:
+  - manifest.json
+  - metadata.json
+  - natrix.lock
+  - Natrixfile
+  - checksums
 It does NOT package the runtime.
 It ensures reproducibility, not portability.
 
-Roadmap
-Alpha
+---
+***Roadmap***
 
-Stable CLI
+**Alpha**
+- Stable CLI
+- Stable metadata model
+- Natrixfile parser
+- Lockfile integrity
+***Beta***
+- Plugin system, isolation levels expansion, partial Rust migration
+- Strong isolation (namespaces), native dependency engine, performance-critical components in Rust
+- Design Goals, deterministic environments, clean architecture
+- Backend abstraction, zero hidden state, fully declarative builds
 
-Stable metadata model
-
-Natrixfile parser
-
-Lockfile integrity
-
-Beta
-
-Plugin system
-
-Isolation levels expansion
-
-Partial Rust migration
-
-Future
-
-Strong isolation (namespaces)
-
-Native dependency engine
-
-Performance-critical components in Rust
-
-Design Goals
-
-Deterministic environments
-
-Clean architecture
-
-Backend abstraction
-
-Zero hidden state
-
-Fully declarative builds
-
-Warning
-
-This project is experimental and under active development.
-Internal APIs may change.
+---
+**Warning**
+***This project is experimental and under active development.
+Internal APIs may change.***
