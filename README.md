@@ -72,34 +72,27 @@ environment "example" {
         numpy == "2.0";
     }
 
-}```
-
+}
+```
 The Natrixfile is parsed and compiled into structured metadata before execution.
 
+
+---
 Alpha Features (0.0.1)
 
-Environment creation
+- Environment creation
+- Metadata generation
+- Dependency installation (pip backend)
+- Lockfile generation
+- Declarative environment builds
+- Manual activation (venv-style)
+- Export to .natenv (reproducible archive format)
+- Backend System
+- Alpha backend:
+- pip (internal usage)
+- Runtime reuse (system Python / venv style)
 
-Metadata generation
-
-Dependency installation (pip backend)
-
-Lockfile generation
-
-Declarative environment builds
-
-Manual activation (venv-style)
-
-Export to .natenv (reproducible archive format)
-
-Backend System
-
-Alpha backend:
-
-pip (internal usage)
-
-Runtime reuse (system Python / venv style)
-
+---  
 Future backend:
 
 Native dependency resolver
