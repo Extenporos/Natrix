@@ -114,6 +114,7 @@ It ensures reproducibility, not portability.
 - Stable metadata model
 - Natrixfile parser
 - Lockfile integrity
+
 ***Beta***
 - Plugin system, isolation levels expansion, partial Rust migration
 - Strong isolation (namespaces), native dependency engine, performance-critical components in Rust
@@ -121,6 +122,8 @@ It ensures reproducibility, not portability.
 - Backend abstraction, zero hidden state, fully declarative builds
 
 ---
+
 **Warning**
+
 ***This project is experimental and under active development.
 Internal APIs may change.***
