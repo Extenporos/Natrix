@@ -5,6 +5,9 @@
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 
 # Natrix Early Alpha v1.0.0
+Natrix is in alpha, that means is still in development and can have a lot of bugs.
+So, if there's any problem or bug, make an issue and if not, even better.
+
 ## About
 Natrix is a CLI user-friendly which manages environments like Conda or venv.
 
