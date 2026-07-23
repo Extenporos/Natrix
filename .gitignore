@@ -31,3 +31,7 @@ htmlcov/
 
 # Local config
 .env
+# Images
+*.png
+*.svg
+*.jpg
