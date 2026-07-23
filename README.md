@@ -1,5 +1,4 @@
-![image](Assets/Natrix.svg)
-
+![image](Natrix.png)
 ![Python](https://img.shields.io/badge/Python-3.13+-blue)
 ![License](https://img.shields.io/github/license/Extenporos/Natrix)
 ![Issues](https://img.shields.io/github/issues/Extenporos/Natrix)
