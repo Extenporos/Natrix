@@ -2,6 +2,7 @@
 # maybe its too complicated to develop a parser but idk, i think
 # da main class
 import json
+import re
 from .interpreter import Interpreter
 # from core import NEC
 class _Token:
@@ -9,11 +10,19 @@ class _Token:
         self.type = token_type
         self.value = value
 
+    _QUOTED = re.compile(r'"(?P<dq>[^"]*)"|\'(?P<sq>[^\']*)\'|(?P<word>\S+)')
+
     @staticmethod
     def _tokenize(text: str):
-        words = text.split()
         tokens = []
-        for word in words:
+        for match in _Token._QUOTED.finditer(text):
+            quoted = match.group("dq")
+            if quoted is None:
+                quoted = match.group("sq")
+            if quoted is not None:
+                tokens.append(_Token("WORD", quoted))
+                continue
+            word = match.group("word")
             if word.startswith("--"):
                 tokens.append(_Token("FLAG", word))
             elif word.startswith("-") and len(word) > 1:
