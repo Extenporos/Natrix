@@ -1,3 +1,11 @@
+# OUTDATED README
+
+***Natrix is being re-writed on Rust, if you want to help, please enter to https://github.com/Extenporos/NatrixRustTemp***
+
+**If you want to help with Natrix, you can work with this but it will be unsupported, only the rust version will be supported.**
+
+#
+
 ![image](Natrix.png)
 ![Python](https://img.shields.io/badge/Python-3.13+-blue)
 ![License](https://img.shields.io/github/license/Extenporos/Natrix)
