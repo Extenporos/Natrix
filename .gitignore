@@ -1,37 +1,26 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
+# Rust build artifacts
+/target/
+**/target/
 
-# Virtual environments
-.venv/
-venv/
-env/
+# Cargo lockfile is usually committed for binaries, but you can uncomment if preferred:
+# Cargo.lock
 
-# IDEs
-.vscode/
-.idea/
+# Rustfmt backups
+**/*.rs.bk
 
-# OS
+# Editor/OS files
 .DS_Store
 Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
 
 # Logs
 *.log
 
-# Distribution
-build/
-dist/
-*.egg-info/
-
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-
-# Local config
+# Local env files
 .env
-# Images
-*.png
-*.svg
-*.jpg
+.env.*
+# Test files of natrix
+.natrix

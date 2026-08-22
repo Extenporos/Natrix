@@ -1,0 +1,9 @@
+[package]
+name = "Natrix"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+console = "0.16"
+indicatif = "0.18"
+anyhow = "1.0.104"
