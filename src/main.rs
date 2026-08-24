@@ -3,7 +3,6 @@ use std::{io::{self, Write}}; // io library
 mod commands; //commands
 mod handler; // handler
 mod createenv; //js bc rust analyzer is a mf
-//use commands::hello;
 fn main() {
     let welcome = Style::new().bright().cyan().bold(); //welcome message style
     let shell = Style::new().bright().cyan().bold(); // shell style

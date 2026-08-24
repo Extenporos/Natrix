@@ -1,4 +1,4 @@
-use anyhow::{Ok, Result}; // error management 
+use anyhow::{Context, Ok, Result}; // error management 
 use std::collections::HashMap; // registry for commands
 use console::{Style, Term}; // styles and others things
 use crate::createenv::create_env; //create env module
@@ -26,7 +26,7 @@ fn create(arguments: &[&str]) -> Result<()> { //create environment command
         println!("The environment name wasn't given");
         return Ok(());
     };
-    create_env(nameenv)?;
+    create_env(nameenv).context("could not create environment")?;
     Ok(())
 }
 fn test(arguments: &[&str]) -> Result<()> {
