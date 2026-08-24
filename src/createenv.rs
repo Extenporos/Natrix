@@ -4,16 +4,19 @@ use std::io::{self, Write}; // for write files
 use configparser::ini::Ini;
 use std::{process::Command, path::PathBuf};
 use serde::{Deserialize, Serialize};
-
+use crate::utils::paths;
 pub fn create_env(name: &str) -> Result<()> {
-    let mut env = PathBuf::from(".natrix"); // .natrix directory idk where it is but default is root of executable
+    let mut env = paths::environments_dir()?;
     /* fs::create_dir_all(&env).context("could not create .natrix directory")?; commented because when you run natrix for first time, creates the .natrix directory
     and because env.push and the env create dir exists makes the env directory with .natrix lol*/
     //request python version
-    print!("Python Version? (e.g. 3.13: ");
+    print!("Python Version? (e.g. 3.13): ");
     io::stdout().flush()?;
+    
     let mut version = String::new(); //string of python version
+    
     io::stdin().read_line(&mut version)?; //saves version string
+    
     let version = version.trim();
     let python = format!("python{}", version);
 
@@ -29,11 +32,28 @@ pub fn create_env(name: &str) -> Result<()> {
         }
 
         _ => {
-            println!("Python {version} was not found.");
-            println!("Please install Python {version}.");
+            return Err(anyhow!(
+                "Python {version} was not found.\nPlease install Python '{version}'."
+            ));
         }
     }
-    env.push("env");
+    #[cfg(windows)]
+    let executable_path = Command::new("where")
+        .arg(&python)
+        .output()?;
+
+    #[cfg(unix)]
+    let executable_path = Command::new("which")
+        .arg(&python)
+        .output()?;
+
+    let executable_path = PathBuf::from(
+        String::from_utf8(executable_path.stdout)
+            .context("could not read Python executable path")?
+            .trim(),
+    );
+
+    // create folders
     fs::create_dir_all(&env).context("could not create env folder")?; //.natrix/env directory
     env.push(name);
     if env.exists() { // if exists will use this error
@@ -44,7 +64,11 @@ pub fn create_env(name: &str) -> Result<()> {
         ));
     }
     fs::create_dir(&env)?;
+    env.push(".natfiles");
+    fs::create_dir(&env)?;
+    //copy the python executable
     // make files code below
+    env.pop();
     env.push("pyproject.toml"); // pyproject toml path
     
     fs::File::create_new(&env)
@@ -74,7 +98,7 @@ pub fn create_env(name: &str) -> Result<()> {
     };
     
     let content = toml::to_string_pretty(&pyprojectdata)?;
-    println!("Config content (pyproject): {}", content);
+    println!("Config content (pyproject):\n{}", content);
     println!("You can change the config content on {:?}.", env);
     fs::write(&env, content)
         .context("could not write pyproject.toml")?;
@@ -89,6 +113,7 @@ pub fn create_env(name: &str) -> Result<()> {
     
     natconf.set("python", "version", Some(version.to_string()));
     natconf.set("python", "implementation", Some("CPython".to_string()));
+    natconf.set("python", "executable", Some("test".to_string()));
     /*
     [natenv]
     version = 1
