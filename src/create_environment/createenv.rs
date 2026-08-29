@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Ok, Result};
-use crate::create_environment::{get_python, create_dirs};
-use std::io::{self, Write};
+use crate::{create_environment::{create_dirs, create_files, get_executable}, utils::paths};
+use std::{io::{self, Write}};
+use serde::{Deserialize, Serialize};
 
 pub fn create_env(name: &str) -> Result<()> {
     // getting the python version
@@ -15,9 +16,30 @@ pub fn create_env(name: &str) -> Result<()> {
             "No Python version was given."
         ));
     }
-    get_python::get_python(&version)?;
+    get_executable::get_python(&version)?;
     // creating dirs
     create_dirs::create_env_folder(name)?;
     create_dirs::make_binaries_folder(name)?;
+    // create files
+    create_files::create_pyproject(name)?;
+    create_files::create_natconf(name)?;
+    // write files
+    let files_path = paths::environments_dir().unwrap().join(name);
+    println!("{:#?}", files_path);
+     //structs
+    #[derive(Debug, Serialize, Deserialize)]
+    struct PyProject {
+        project: Project
+    }
+    #[derive(Debug, Serialize, Deserialize)]
+    struct Project {
+        name: String,
+        version: String,
+        description: String,
+
+        #[serde(rename = "requires-python")]
+        requires_python: String,
+    }
+
     Ok(())
 }
