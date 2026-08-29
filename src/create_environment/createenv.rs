@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Ok, Result};
 use crate::{create_environment::{create_dirs, create_files, get_executable}, utils::paths};
-use std::{io::{self, Write}};
+use std::{fs, io::{self, Write}};
 use serde::{Deserialize, Serialize};
 
 pub fn create_env(name: &str) -> Result<()> {
@@ -25,11 +25,12 @@ pub fn create_env(name: &str) -> Result<()> {
     create_files::create_natconf(name)?;
     // write files
     let files_path = paths::environments_dir().unwrap().join(name);
+    let pyproject_path = files_path.join("pyproject.toml");
     println!("{:#?}", files_path);
      //structs
     #[derive(Debug, Serialize, Deserialize)]
     struct PyProject {
-        project: Project
+        project: Project,
     }
     #[derive(Debug, Serialize, Deserialize)]
     struct Project {
@@ -40,6 +41,13 @@ pub fn create_env(name: &str) -> Result<()> {
         #[serde(rename = "requires-python")]
         requires_python: String,
     }
-
+    let proj = PyProject {
+        project: Project {name: name.to_string(),
+        version: "1.0".to_string(),
+        description: "".to_string(),
+        requires_python: format!(">={}", version).to_string(),
+    }};
+    let toml_str = toml::to_string_pretty(&proj)?;
+    fs::write(&pyproject_path, toml_str)?;
     Ok(())
 }
