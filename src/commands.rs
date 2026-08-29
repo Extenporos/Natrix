@@ -25,7 +25,7 @@ fn about(_arguments: &[&str]) -> Result<()> { // about command
     A fast and lightweight package and runtime manager.
 
     Developed by Vortex
-    Compiled with Rust {}
+    Compiled with: {}
 
     Build Information
     • Target: {}
