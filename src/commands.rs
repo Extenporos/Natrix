@@ -1,18 +1,50 @@
 use anyhow::{Context, Ok, Result}; // error management 
-use std::collections::HashMap; // registry for commands
+use std::{collections::HashMap}; // registry for commands
 use console::{Style, Term}; // styles and others things
-use crate::createenv::create_env; //create env module
+use crate::create_environment::createenv; //create env module
+
+mod build_info {
+    include!(concat!(env!("OUT_DIR"), "/built.rs"));
+}
 
 type CommandFn = fn(&[&str]) -> Result<()>;
-
+// built-in commands lol
 fn version(_arguments: &[&str]) -> Result<()> { //version command
-    let version_style = Style::new().bright().cyan();
+    let version_style = Style::new().bold().cyan();
     println!("{}", version_style.apply_to("Natrix v1.1.0 'Rust Re-Write'"));
     Ok(()) //success value, if not success, then raise an error with anyhow
 }
 
 fn about(_arguments: &[&str]) -> Result<()> { // about command
-    println!("Natrix Development Test...");
+    println!(r#"
+    About Natrix
+
+    Natrix
+    Version {}
+
+    A fast and lightweight package and runtime manager.
+
+    Developed by Vortex
+    Compiled with Rust {}
+
+    Build Information
+    • Target: {}
+    • Profile: {}
+    • Build date: {}
+    • Git commit: {}
+
+    Copyright © 2026 VortexNN
+    Licensed under the MIT License
+
+    Thanks for using Natrix.
+    "#,
+    build_info::PKG_VERSION,
+    build_info::RUSTC_VERSION,
+    build_info::TARGET,
+    build_info::PROFILE,
+    build_info::BUILT_TIME_UTC,
+    build_info::GIT_COMMIT_HASH.unwrap_or("unknown"),
+);
     Ok(())
 }
 
@@ -26,15 +58,7 @@ fn create(arguments: &[&str]) -> Result<()> { //create environment command
         println!("The environment name wasn't given");
         return Ok(());
     };
-    create_env(nameenv).context("could not create environment")?;
-    Ok(())
-}
-fn test(arguments: &[&str]) -> Result<()> {
-    if arguments.is_empty() {
-        println!("No argument was given")
-    } else {
-        println!("Arguments were given: {}", arguments.join(" "))
-    }
+    createenv::create_env(nameenv).context("could not create environment")?;
     Ok(())
 }
 
@@ -44,7 +68,6 @@ pub fn command_map() -> HashMap<&'static str, CommandFn> { //registry function
     commands.insert("about", about);
     commands.insert("clear", clear);
     commands.insert("create", create);
-    commands.insert("test", test);
     commands //idk why this exists
 }
 

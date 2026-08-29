@@ -2,6 +2,10 @@
 name = "Natrix"
 version = "0.1.0"
 edition = "2024"
+build = "src/build.rs"
+
+[build-dependencies]
+built = { version = "0.7", features = ["chrono", "git2"] }
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
