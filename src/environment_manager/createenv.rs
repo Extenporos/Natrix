@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Ok, Result};
-use crate::{create_environment::{create_dirs, create_files, get_executable}, utils::paths};
+use crate::{environment_manager::{create_dirs, create_files, get_executable}, utils::paths};
 use std::{fs, io::{self, Write}};
 use serde::{Deserialize, Serialize};
 
