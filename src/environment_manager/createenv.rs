@@ -1,7 +1,9 @@
 use anyhow::{anyhow, Ok, Result};
-use crate::{environment_manager::{create_dirs, create_files, get_executable}, utils::paths};
+use crate::{environment_manager::{create_dirs, create_files}, utils::paths};
 use std::{fs, io::{self, Write}};
 use serde::{Deserialize, Serialize};
+use configparser::ini::Ini;
+use crate::runtime_manager;
 
 pub fn create_env(name: &str) -> Result<()> {
     // getting the python version
@@ -16,7 +18,6 @@ pub fn create_env(name: &str) -> Result<()> {
             "No Python version was given."
         ));
     }
-    get_executable::get_python(&version)?;
     // creating dirs
     create_dirs::create_env_folder(name)?;
     create_dirs::make_binaries_folder(name)?;
@@ -27,7 +28,7 @@ pub fn create_env(name: &str) -> Result<()> {
     let files_path = paths::environments_dir().unwrap().join(name);
     let pyproject_path = files_path.join("pyproject.toml");
     println!("{:#?}", files_path);
-     //structs
+     // PyProject structs
     #[derive(Debug, Serialize, Deserialize)]
     struct PyProject {
         project: Project,
@@ -49,5 +50,17 @@ pub fn create_env(name: &str) -> Result<()> {
     }};
     let toml_str = toml::to_string_pretty(&proj)?;
     fs::write(&pyproject_path, toml_str)?;
+     // ECF struct
+    let runtime_path = runtime_manager::get_runtime::find_runtime(version)?;
+    let mut ecf = Ini::new();
+    let config_path = files_path.join("natConf.cfg");
+    ecf.load(&config_path).unwrap();
+
+    ecf.set("project", "version", Some("1.0.0".to_string()));
+    ecf.set("project", "name", Some(name.to_string()));
+    ecf.set("python", "version", Some(version.to_string()));
+    ecf.set("python", "executable", Some(runtime_path.display().to_string())); // Still in development
+
+    ecf.write(config_path).unwrap();
     Ok(())
 }
