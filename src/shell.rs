@@ -12,9 +12,10 @@ pub fn shell() {
 
         let mut input: String = String::new(); //string declaration
         io::stdin().read_line(&mut input).unwrap(); //reads the line
-
+        if input == "\n" {
+            continue;
+        }
         let command: &str = input.trim(); // saves the readed line of the input
-
         if command == "exit" { //built-in exit command
             break;
         }

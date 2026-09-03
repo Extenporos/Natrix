@@ -11,11 +11,3 @@ pub fn natrix_dir() -> Result<PathBuf> {
 pub fn environments_dir() -> Result<PathBuf> {
     Ok(natrix_dir()?.join("env"))
 }
-
-pub fn runtimes_dir() -> Result<PathBuf> {
-    Ok(natrix_dir()?.join("runtimes"))
-}
-
-pub fn runtime_dir(version: &str) -> Result<PathBuf> {
-    Ok(runtimes_dir()?.join(version))
-}

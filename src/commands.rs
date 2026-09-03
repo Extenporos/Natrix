@@ -1,7 +1,7 @@
 use anyhow::{Context, Ok, Result}; // error management 
 use std::{collections::HashMap}; // registry for commands
 use console::{Style, Term}; // styles and others things
-use crate::create_environment::createenv; //create env module
+use crate::environment_manager::createenv; //create env module
 
 mod build_info {
     include!(concat!(env!("OUT_DIR"), "/built.rs"));
