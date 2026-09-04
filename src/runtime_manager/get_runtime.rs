@@ -51,7 +51,7 @@ pub fn find_runtime(version: &str) -> anyhow::Result<PathBuf> {
     .ok_or_else(|| anyhow::anyhow!("Python Path was empty"))?;
     let path = PathBuf::from(path.trim());
     if !path.exists() {
-        anyhow::bail!("Python executable does not exist: {}", path.display());
+        anyhow::bail!("Python executable does not exist.");
     }
     validate_python_runtime(&path, version)?;
     Ok(path)
