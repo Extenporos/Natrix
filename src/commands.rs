@@ -1,7 +1,7 @@
 use anyhow::{Context, Ok, Result}; // error management 
 use std::{collections::HashMap}; // registry for commands
 use console::{Style, Term}; // styles and others things
-use crate::environment_manager::createenv; //create env module
+use crate::environment_manager::{createenv, removeenv}; //create env module
 
 mod build_info {
     include!(concat!(env!("OUT_DIR"), "/built.rs"));
@@ -55,10 +55,18 @@ fn clear(_arguments: &[&str]) -> Result<()> { //clear command
 
 fn create(arguments: &[&str]) -> Result<()> { //create environment command
     let Some(nameenv) = arguments.first() else {
-        println!("The environment name wasn't given");
+        println!("The environment name wasn't given.");
         return Ok(());
     };
     createenv::create_env(nameenv).context("could not create environment")?;
+    Ok(())
+}
+fn remove(arguments: &[&str]) -> Result<()> {
+    let Some(nameenv) = arguments.first() else {
+        println!("The environment name wasn't given.");
+        return Ok(());
+    };
+    removeenv::remove_env(nameenv).context("could not remove environment")?;
     Ok(())
 }
 
@@ -68,6 +76,7 @@ pub fn command_map() -> HashMap<&'static str, CommandFn> { //registry function
     commands.insert("about", about);
     commands.insert("clear", clear);
     commands.insert("create", create);
+    commands.insert("remove", remove);
     commands //idk why this exists
 }
 
