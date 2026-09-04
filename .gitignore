@@ -3,7 +3,7 @@
 **/target/
 
 # Cargo lockfile is usually committed for binaries, but you can uncomment if preferred:
-# Cargo.lock
+Cargo.lock
 
 # Rustfmt backups
 **/*.rs.bk
