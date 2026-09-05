@@ -1,0 +1,42 @@
+name: Nightly CI
+
+on:
+  push:
+    branches:
+      - Nightly
+  pull_request:
+    branches:
+      - Nightly
+
+jobs:
+  check:
+    name: Check Rust project
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Format code if check fails
+        if: failure()
+        run: cargo fmt --all
+
+      - name: Cargo check
+        run: cargo check --all-targets
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run tests
+        run: cargo test --all-features
+
+      - name: Build release
+        run: cargo build --release
