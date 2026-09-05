@@ -23,12 +23,13 @@ pub fn create_env(name: &str) -> Result<()> {
     let files_path = paths::environments_dir().unwrap().join(name);
     let env_path = files_path.join(".natEnv");
     let lib_env_path = env_path.join("lib");
+    let site_packages = lib_env_path.join("site-packages");
     let bin_env_path = env_path.join("bin");
 
     // creating dirs
     create_dirs::create_env_folder(name)?; // .natrix/env/test
     create_dirs::make_binaries_folder(name)?; //.natrix/env/test/.natEnv
-    fs::create_dir_all(&lib_env_path)?;
+    fs::create_dir_all(&site_packages)?;
     fs::create_dir_all(&bin_env_path)?;
     println!("Successfully created environment directories...");
     println!("Searching Python{} runtime...", version);
