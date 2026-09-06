@@ -20,7 +20,7 @@ jobs:
           components: rustfmt, clippy
 
       - name: Check formatting
-        run: cargo fmt --all -- --check
+        run: cargo fmt --all
 
       - name: Cargo check
         run: cargo check --all-targets
