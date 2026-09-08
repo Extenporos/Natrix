@@ -49,7 +49,7 @@ jobs:
             Nightly build from ${{ github.sha }} (branch ${{ github.ref_name }})
           draft: false
           prerelease: true
-          target_commitish: ${{ github.sha }}
+          commitish: ${{ github.sha }}
 
       - name: Upload binary to release
         uses: actions/upload-release-asset@v1
