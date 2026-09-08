@@ -1,0 +1,95 @@
+name: Rust CI
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build_and_release:
+    name: Build and release for PRs and tags
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Cargo check
+        run: cargo check --all-targets
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run tests
+        run: cargo test --all-features
+
+      - name: Build release
+        run: cargo build --release
+
+      # Create a prerelease for pull requests targeting master
+      - name: Create PR Release
+        if: github.event_name == 'pull_request'
+        id: create_pr_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: pr-${{ github.event.pull_request.number }}-${{ github.run_number }}
+          release_name: "PR #${{ github.event.pull_request.number }} - ${{ github.run_number }}"
+          body: |
+            Build for PR #${{ github.event.pull_request.number }} (head sha: ${{ github.sha }})
+          draft: false
+          prerelease: true
+          target_commitish: ${{ github.sha }}
+
+      - name: Upload PR binary to release
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_pr_release.outputs.upload_url }}
+          asset_path: target/release/natrix
+          asset_name: natrix-pr-${{ github.event.pull_request.number }}-${{ github.run_number }}
+          asset_content_type: application/octet-stream
+
+      # Create or update official release for tag pushes
+      - name: Create Tag Release
+        if: startsWith(github.ref, 'refs/tags/')
+        id: create_tag_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: "Natrix ${{ github.ref_name }}"
+          body: |
+            Release created from tag ${{ github.ref_name }} (commit ${{ github.sha }})
+          draft: false
+          prerelease: false
+          target_commitish: ${{ github.sha }}
+
+      - name: Upload tag binary to release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_tag_release.outputs.upload_url }}
+          asset_path: target/release/natrix
+          asset_name: natrix
+          asset_content_type: application/octet-stream
