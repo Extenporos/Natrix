@@ -11,7 +11,7 @@ on:
       - nightly
 
     tags:
-      - "v*.*.*"
+      - "v*"
 
 permissions:
   contents: write
