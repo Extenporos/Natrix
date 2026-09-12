@@ -1,0 +1,293 @@
+name: Rust CI
+
+on:
+  pull_request:
+    branches:
+      - master
+      - nightly
+
+  push:
+    branches:
+      - nightly
+
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+
+  # =========================
+  # Linux x86_64
+  # =========================
+
+  build_linux:
+    name: Build Code (Linux x86_64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Check code
+        run: cargo check --all-targets
+
+      - name: Test Code
+        run: cargo test --all-features
+
+      - name: Build Release
+        run: cargo build --release --target x86_64-unknown-linux-gnu
+
+      - name: Prepare Linux binary
+        if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
+        run: cp target/x86_64-unknown-linux-gnu/release/natrix natrix-linux-x86_64
+
+      - name: Upload Linux binary
+        if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
+        uses: actions/upload-artifact@v6
+        with:
+          name: natrix-linux-x86_64
+          path: natrix-linux-x86_64
+
+
+  # =========================
+  # Windows x86_64
+  # =========================
+
+  build_windows:
+    name: Build Code (Windows x86_64)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Check code
+        run: cargo check --all-targets
+
+      - name: Test Code
+        run: cargo test --all-features
+
+      - name: Build Release
+        run: cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Prepare Windows binary
+        if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
+        run: Copy-Item target\x86_64-pc-windows-msvc\release\natrix.exe natrix-windows-x86_64.exe
+
+      - name: Upload Windows binary
+        if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
+        uses: actions/upload-artifact@v6
+        with:
+          name: natrix-windows-x86_64
+          path: natrix-windows-x86_64.exe
+
+
+  # =========================
+  # macOS ARM64
+  # =========================
+
+  build_macos:
+    name: Build Code (macOS ARM64)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Check code
+        run: cargo check --all-targets
+
+      - name: Test Code
+        run: cargo test --all-features
+
+      - name: Build Release
+        run: cargo build --release --target aarch64-apple-darwin
+
+      - name: Prepare macOS binary
+        if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
+        run: cp target/aarch64-apple-darwin/release/natrix natrix-macos-arm64
+
+      - name: Upload macOS binary
+        if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
+        uses: actions/upload-artifact@v6
+        with:
+          name: natrix-macos-arm64
+          path: natrix-macos-arm64
+
+
+  # =========================
+  # Stable Release
+  # =========================
+
+  release:
+    name: Create Stable Release
+    if: github.ref_type == 'tag'
+    needs:
+      - build_linux
+      - build_windows
+      - build_macos
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download Linux binary
+        uses: actions/download-artifact@v7
+        with:
+          name: natrix-linux-x86_64
+          path: release
+
+      - name: Download Windows binary
+        uses: actions/download-artifact@v7
+        with:
+          name: natrix-windows-x86_64
+          path: release
+
+      - name: Download macOS binary
+        uses: actions/download-artifact@v7
+        with:
+          name: natrix-macos-arm64
+          path: release
+
+      - name: Generate changelog
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CURRENT_TAG="${GITHUB_REF_NAME}"
+
+          PREVIOUS_TAG=$(gh api \
+            "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+            --jq '
+              [.[] | select(.tag_name != "'"${CURRENT_TAG}"'")]
+              | sort_by(.published_at)
+              | reverse
+              | .[0].tag_name
+            ')
+
+          echo "## What's Changed" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+
+          if [ -z "$PREVIOUS_TAG" ]; then
+            echo "### Initial Release" >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+
+            gh api \
+              "repos/${GITHUB_REPOSITORY}/commits?sha=${CURRENT_TAG}&per_page=100" \
+              --jq '
+                .[]
+                | "- \(.commit.message | split("\n")[0])"
+              ' >> CHANGELOG.md
+          else
+            gh api \
+              "repos/${GITHUB_REPOSITORY}/compare/${PREVIOUS_TAG}...${CURRENT_TAG}" \
+              --jq '
+                .commits[]
+                | "- \(.commit.message | split("\n")[0])"
+              ' >> CHANGELOG.md
+          fi
+
+      - name: Make stable release
+        uses: softprops/action-gh-release@v3
+        with:
+          body_path: CHANGELOG.md
+          files: |
+            release/natrix-linux-x86_64
+            release/natrix-windows-x86_64.exe
+            release/natrix-macos-arm64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  # =========================
+  # Nightly Release
+  # =========================
+
+  nightly:
+    name: Create Nightly Release
+    if: github.ref == 'refs/heads/nightly'
+    needs:
+      - build_linux
+      - build_windows
+      - build_macos
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Linux binary
+        uses: actions/download-artifact@v7
+        with:
+          name: natrix-linux-x86_64
+          path: release
+
+      - name: Download Windows binary
+        uses: actions/download-artifact@v7
+        with:
+          name: natrix-windows-x86_64
+          path: release
+
+      - name: Download macOS binary
+        uses: actions/download-artifact@v7
+        with:
+          name: natrix-macos-arm64
+          path: release
+
+      - name: Generate nightly version
+        id: version
+        run: |
+          DATE=$(date -u +"%Y.%m.%d")
+          SHORT_SHA="${GITHUB_SHA::7}"
+
+          echo "tag=v-nightly-${DATE}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+          echo "version=${DATE}-${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate nightly changelog
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CURRENT_SHA="${GITHUB_SHA}"
+
+          echo "## 🌙 Nightly Build" > CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "Experimental build from commit \`${CURRENT_SHA::7}\`." >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "### What's Changed" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+
+          gh api \
+            "repos/${GITHUB_REPOSITORY}/commits?sha=nightly&per_page=30" \
+            --jq '
+              .[]
+              | "- \(.commit.message | split("\n")[0])"
+            ' >> CHANGELOG.md
+
+          echo "" >> CHANGELOG.md
+          echo "---" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "**Commit:** \`${CURRENT_SHA::7}\`" >> CHANGELOG.md
+
+      - name: Make nightly release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "Natrix Nightly ${{ steps.version.outputs.version }}"
+          body_path: CHANGELOG.md
+          prerelease: true
+          files: |
+            release/natrix-linux-x86_64
+            release/natrix-windows-x86_64.exe
+            release/natrix-macos-arm64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
