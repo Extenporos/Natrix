@@ -44,7 +44,7 @@ jobs:
 
       - name: Prepare Linux binary
         if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
-        run: cp target/x86_64-unknown-linux-gnu/release/natrix natrix-linux-x86_64
+        run: cp target/x86_64-unknown-linux-gnu/release/Natrix natrix-linux-x86_64
 
       - name: Upload Linux binary
         if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
@@ -80,7 +80,7 @@ jobs:
 
       - name: Prepare Windows binary
         if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
-        run: Copy-Item target\x86_64-pc-windows-msvc\release\natrix.exe natrix-windows-x86_64.exe
+        run: Copy-Item target\x86_64-pc-windows-msvc\release\Natrix.exe natrix-windows-x86_64.exe
 
       - name: Upload Windows binary
         if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
@@ -116,7 +116,7 @@ jobs:
 
       - name: Prepare macOS binary
         if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
-        run: cp target/aarch64-apple-darwin/release/natrix natrix-macos-arm64
+        run: cp target/aarch64-apple-darwin/release/Natrix natrix-macos-arm64
 
       - name: Upload macOS binary
         if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
