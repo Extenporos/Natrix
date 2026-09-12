@@ -44,7 +44,7 @@ jobs:
 
       - name: Prepare Linux binary
         if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
-        run: cp target/x86_64-unknown-linux-gnu/release/Natrix natrix-linux-x86_64
+        run: cp target/x86_64-unknown-linux-gnu/release/natrix natrix-linux-x86_64
 
       - name: Upload Linux binary
         if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
