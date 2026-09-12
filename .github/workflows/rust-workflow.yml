@@ -133,6 +133,7 @@ jobs:
   release:
     name: First Step
     run: echo "Hello, World!"
+    
     name: Create Stable Release
     if: github.ref_type == 'tag'
     needs:
@@ -220,6 +221,7 @@ jobs:
   nightly:
     name: First Step
     run: echo "Hello, World!"
+    
     name: Create Nightly Release
     if: github.ref == 'refs/heads/nightly'
     needs:
