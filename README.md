@@ -2,6 +2,7 @@
 ![Issues](https://img.shields.io/github/issues/Extenporos/Natrix)
 ![Pull Requests Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
+[![Rust CI](https://github.com/Extenporos/Natrix/actions/workflows/rust-workflow.yml/badge.svg)](https://github.com/Extenporos/Natrix/actions/workflows/rust-workflow.yml)
 
 # Natrix
 
@@ -57,6 +58,7 @@ The shell currently supports these commands:
 - `about` — prints build metadata and project information
 - `clear` — clears the terminal screen
 - `create <name>` — creates a Python environment with the provided name
+- `remove <name>` — removes the Python enviornment with the provided name
 - `exit` — exits the shell
 
 ## Important notes
@@ -64,7 +66,6 @@ The shell currently supports these commands:
 - The project is in early alpha stage.
 - The code currently focuses on Python environment creation.
 - Features such as package installation, environment activation, deletion, listing, and multi-language support are not implemented yet in the current codebase.
-- The README and version metadata may be slightly inconsistent across files; the source currently declares version `1.2.1` in `Cargo.toml`.
 
 ## Project structure
 
