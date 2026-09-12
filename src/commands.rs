@@ -1,6 +1,6 @@
 use anyhow::{Context, Ok, Result}; // error management 
 use std::{collections::HashMap}; // registry for commands
-use console::{Style, Term}; // styles and others things
+use console::Term; // styles and others things
 use crate::environment_manager::createenv; //create env module
 
 mod build_info {
@@ -10,8 +10,7 @@ mod build_info {
 type CommandFn = fn(&[&str]) -> Result<()>;
 // built-in commands lol
 fn version(_arguments: &[&str]) -> Result<()> { //version command
-    let version_style = Style::new().bold().cyan();
-    println!("{}", version_style.apply_to("Natrix v1.1.0 'Rust Re-Write'"));
+    println!("Natrix v{}", build_info::PKG_VERSION);
     Ok(()) //success value, if not success, then raise an error with anyhow
 }
 
