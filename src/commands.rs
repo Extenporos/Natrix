@@ -1,7 +1,7 @@
 use anyhow::{Context, Ok, Result}; // error management 
 use std::{collections::HashMap}; // registry for commands
 use console::Term; // styles and others things
-use crate::environment_manager::createenv; //create env module
+use crate::environment_manager::{createenv, removeenv, self}; //create env module
 
 mod build_info {
     include!(concat!(env!("OUT_DIR"), "/built.rs"));
@@ -60,13 +60,31 @@ fn create(arguments: &[&str]) -> Result<()> { //create environment command
     createenv::create_env(nameenv).context("could not create environment")?;
     Ok(())
 }
+fn remove(arguments: &[&str]) -> Result<()> {
+    let Some(nameenv) = arguments.first() else {
+        println!("The environment name wasn't given.");
+        return Ok(());
+    };
+    removeenv::remove_env(nameenv).context("could not remove environment")?;
+    Ok(())
+}
 
+fn activate(arguments: &[&str]) -> Result<()> {
+    let Some(nameenv) = arguments.first() else {
+        println!("The environment name wasn't given.");
+        return Ok(());
+    };
+    environment_manager::activation_modules::activate::activate(nameenv);
+    Ok(())
+}
 pub fn command_map() -> HashMap<&'static str, CommandFn> { //registry function
     let mut commands: HashMap<&'static str, CommandFn> = HashMap::new(); // makes the registry
     commands.insert("version", version); // register the command
     commands.insert("about", about);
     commands.insert("clear", clear);
     commands.insert("create", create);
+    commands.insert("remove", remove);
+    commands.insert("activate", activate);
     commands //idk why this exists
 }
 
