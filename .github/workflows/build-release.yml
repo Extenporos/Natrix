@@ -1,0 +1,140 @@
+name: Build & Release
+
+on:
+  push:
+    branches:
+      - nightly
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build_linux:
+    name: Build Linux x86_64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-gnu
+      - name: Build release
+        run: cargo build --release --target x86_64-unknown-linux-gnu
+      - name: Prepare artifact
+        run: cp target/x86_64-unknown-linux-gnu/release/natrix natrix-linux-x86_64
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: natrix-linux-x86_64
+          path: natrix-linux-x86_64
+
+  build_windows:
+    name: Build Windows x86_64
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - name: Build release
+        run: cargo build --release --target x86_64-pc-windows-msvc
+      - name: Prepare artifact
+        run: Copy-Item target\x86_64-pc-windows-msvc\release\Natrix.exe natrix-windows-x86_64.exe
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: natrix-windows-x86_64
+          path: natrix-windows-x86_64.exe
+
+  build_macos:
+    name: Build macOS ARM64
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+      - name: Build release
+        run: cargo build --release --target aarch64-apple-darwin
+      - name: Prepare artifact
+        run: cp target/aarch64-apple-darwin/release/natrix natrix-macos-arm64
+      - name: Upload artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: natrix-macos-arm64
+          path: natrix-macos-arm64
+
+  release:
+    name: Publish GitHub Release
+    if: github.ref_type == 'tag' || github.ref == 'refs/heads/nightly'
+    needs:
+      - build_linux
+      - build_windows
+      - build_macos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Linux artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: natrix-linux-x86_64
+          path: release
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: natrix-windows-x86_64
+          path: release
+
+      - name: Download macOS artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: natrix-macos-arm64
+          path: release
+
+      - name: Generate release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${GITHUB_REF}" = "refs/heads/nightly" ]; then
+            echo "## 🌙 Natrix Nightly" > CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            echo "Experimental build from commit \`${GITHUB_SHA::7}\`." >> CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            echo "**Commit:** \`${GITHUB_SHA::7}\`" >> CHANGELOG.md
+          else
+            CURRENT_TAG="${GITHUB_REF_NAME}"
+            PREVIOUS_TAG=$(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" --jq '[.[] | select(.tag_name != "'"${CURRENT_TAG}"'")] | sort_by(.published_at) | reverse | .[0].tag_name')
+            echo "## What's Changed" > CHANGELOG.md
+            echo "" >> CHANGELOG.md
+            if [ -n "$PREVIOUS_TAG" ]; then
+              gh api "repos/${GITHUB_REPOSITORY}/compare/${PREVIOUS_TAG}...${CURRENT_TAG}" --jq '.commits[] | "- \\(.commit.message | split("\\n")[0])"' >> CHANGELOG.md
+            else
+              echo "### Initial Release" >> CHANGELOG.md
+              echo "" >> CHANGELOG.md
+              gh api "repos/${GITHUB_REPOSITORY}/commits?sha=${CURRENT_TAG}&per_page=100" --jq '.[] | "- \\(.commit.message | split("\\n")[0])"' >> CHANGELOG.md
+            fi
+          fi
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('v-nightly-{0}-{1}', github.run_number, github.sha) }}
+          name: ${{ github.ref_type == 'tag' && format('Natrix {0}', github.ref_name) || format('Natrix Nightly #{0}', github.run_number) }}
+          body_path: CHANGELOG.md
+          prerelease: ${{ github.ref == 'refs/heads/nightly' }}
+          files: |
+            release/natrix-linux-x86_64
+            release/natrix-windows-x86_64.exe
+            release/natrix-macos-arm64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
