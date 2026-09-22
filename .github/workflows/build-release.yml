@@ -129,7 +129,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_type == 'tag' && github.ref_name || format('v-nightly-{0}-{1}', github.run_number, github.sha) }}
-          name: ${{ github.ref_type == 'tag' && format('Natrix {0}', github.ref_name) || format('Natrix Nightly #{0}', github.run_number) }}
+          name: "${{ github.ref_type == 'tag' && format('Natrix {0}', github.ref_name) || format('Natrix Nightly #{0}', github.run_number) }}"
           body_path: CHANGELOG.md
           prerelease: ${{ github.ref == 'refs/heads/nightly' }}
           files: |
