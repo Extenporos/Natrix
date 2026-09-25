@@ -84,19 +84,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Linux artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: natrix-linux-x86_64
           path: release
 
       - name: Download Windows artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: natrix-windows-x86_64
           path: release
 
       - name: Download macOS artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: natrix-macos-arm64
           path: release
