@@ -2,7 +2,7 @@
 ![Issues](https://img.shields.io/github/issues/Extenporos/Natrix)
 ![Pull Requests Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
-[![Rust CI](https://github.com/Extenporos/Natrix/actions/workflows/rust-workflow.yml/badge.svg)](https://github.com/Extenporos/Natrix/actions/workflows/rust-workflow.yml)
+[![CI](https://github.com/Extenporos/Natrix/actions/workflows/test.yml/badge.svg)](https://github.com/Extenporos/Natrix/actions/workflows/test.yml)
 
 # Natrix
 
