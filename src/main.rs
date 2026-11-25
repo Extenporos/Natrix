@@ -1,9 +1,9 @@
-mod shell;
 mod commands; //commands
-mod handler; // handler
 mod environment_manager; //js bc rust analyzer is a mf
-mod utils;
+mod handler; // handler
 mod runtime_manager;
+mod shell;
+mod utils;
 
 fn main() {
     shell::shell();

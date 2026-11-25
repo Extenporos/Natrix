@@ -1,0 +1,32 @@
+name: Test code.
+
+on: [push, pull_request]
+
+permissions:
+    contents: write
+
+env:
+    CARGO_TERM_COLOR: always
+
+jobs:
+    test_code:
+        name: Test Code
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v7
+
+          - name: Install Rust
+            uses: dtolnay/rust-toolchain@stable
+            with:
+              components: clippy, rustfmt
+
+          - name: Check formatting
+            run: cargo fmt --all -- --check
+
+          - name: Check code
+            run: cargo test --all-targets
+
+          - name: Lint search with Clippy
+            run: cargo clippy --all-targets --all-features --locked -- -D warnings
+

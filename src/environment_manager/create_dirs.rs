@@ -1,6 +1,6 @@
-use std::fs;
-use anyhow::{Context, Ok, Result};
 use crate::utils::paths;
+use anyhow::{Context, Ok, Result};
+use std::fs;
 
 pub fn create_env_folder(path: &str) -> Result<()> {
     let env_path = paths::environments_dir()?;

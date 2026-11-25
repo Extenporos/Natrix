@@ -1,6 +1,6 @@
+use crate::utils::paths;
 use anyhow::{Ok, Result};
 use std::fs;
-use crate::utils::paths;
 
 pub fn create_pyproject(path: &str) -> Result<()> {
     let i_path = paths::environments_dir()?;

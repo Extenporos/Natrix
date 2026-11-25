@@ -1,7 +1,7 @@
-use anyhow::{Context, Ok, Result}; // error management 
-use std::{collections::HashMap}; // registry for commands
+use crate::environment_manager::{self, createenv, removeenv};
+use anyhow::{Context, Ok, Result}; // error management
 use console::Term; // styles and others things
-use crate::environment_manager::{createenv, removeenv, self}; //create env module
+use std::collections::HashMap; // registry for commands //create env module
 
 mod build_info {
     include!(concat!(env!("OUT_DIR"), "/built.rs"));
@@ -9,13 +9,16 @@ mod build_info {
 
 type CommandFn = fn(&[&str]) -> Result<()>;
 // built-in commands lol
-fn version(_arguments: &[&str]) -> Result<()> { //version command
+fn version(_arguments: &[&str]) -> Result<()> {
+    //version command
     println!("Natrix v{}", build_info::PKG_VERSION);
     Ok(()) //success value, if not success, then raise an error with anyhow
 }
 
-fn about(_arguments: &[&str]) -> Result<()> { // about command
-    println!(r#"
+fn about(_arguments: &[&str]) -> Result<()> {
+    // about command
+    println!(
+        r#"
     About Natrix
 
     Natrix
@@ -37,22 +40,24 @@ fn about(_arguments: &[&str]) -> Result<()> { // about command
 
     Thanks for using Natrix.
     "#,
-    build_info::PKG_VERSION,
-    build_info::RUSTC_VERSION,
-    build_info::TARGET,
-    build_info::PROFILE,
-    build_info::BUILT_TIME_UTC,
-    build_info::GIT_COMMIT_HASH.unwrap_or("unknown"),
-);
+        build_info::PKG_VERSION,
+        build_info::RUSTC_VERSION,
+        build_info::TARGET,
+        build_info::PROFILE,
+        build_info::BUILT_TIME_UTC,
+        build_info::GIT_COMMIT_HASH.unwrap_or("unknown"),
+    );
     Ok(())
 }
 
-fn clear(_arguments: &[&str]) -> Result<()> { //clear command
+fn clear(_arguments: &[&str]) -> Result<()> {
+    //clear command
     Term::stdout().clear_screen()?;
     Ok(())
 }
 
-fn create(arguments: &[&str]) -> Result<()> { //create environment command
+fn create(arguments: &[&str]) -> Result<()> {
+    //create environment command
     let Some(nameenv) = arguments.first() else {
         println!("The environment name wasn't given");
         return Ok(());
@@ -77,7 +82,8 @@ fn activate(arguments: &[&str]) -> Result<()> {
     environment_manager::activation_modules::activate::activate(nameenv);
     Ok(())
 }
-pub fn command_map() -> HashMap<&'static str, CommandFn> { //registry function
+pub fn command_map() -> HashMap<&'static str, CommandFn> {
+    //registry function
     let mut commands: HashMap<&'static str, CommandFn> = HashMap::new(); // makes the registry
     commands.insert("version", version); // register the command
     commands.insert("about", about);
