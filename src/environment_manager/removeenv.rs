@@ -1,6 +1,6 @@
 use crate::utils::paths;
-use std::fs;
 use anyhow::Result;
+use std::fs;
 
 pub fn remove_env(name: &str) -> Result<()> {
     println!("Fetching name...");

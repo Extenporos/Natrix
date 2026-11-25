@@ -1,9 +1,10 @@
-use std::{process::Command, io::{self, Write}};
+use std::{
+    io::{self, Write},
+    process::Command,
+};
 
-fn run_external (command: &str, args: Vec<&str>) -> anyhow::Result<()> {
-    let status = Command::new(command)
-    .args(args)
-    .status()?;
+fn run_external(command: &str, args: Vec<&str>) -> anyhow::Result<()> {
+    let status = Command::new(command).args(args).status()?;
 
     if !status.success() {
         eprintln!("Command exited with {status}");
@@ -16,7 +17,7 @@ fn mini_handler(input: &str) -> anyhow::Result<bool> {
     let mut parts = input.split_whitespace();
 
     let command = match parts.next() {
-        Some(command ) => command,
+        Some(command) => command,
         None => return Ok(false),
     };
 
@@ -29,7 +30,7 @@ fn mini_handler(input: &str) -> anyhow::Result<bool> {
         "pwd" => {
             println!("{}", std::env::current_dir()?.display());
         }
-        
+
         "clear" => {
             print!("\x1B[2J\x1B[1;1H");
         }

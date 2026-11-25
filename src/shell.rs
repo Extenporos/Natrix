@@ -1,6 +1,6 @@
-use console::Style; // styles for the CLI
-use std::{io::{self, Write}}; // io library
 use crate::handler;
+use console::Style; // styles for the CLI
+use std::io::{self, Write}; // io library
 pub fn shell() {
     let welcome = Style::new().bright().cyan().bold(); //welcome message style
     // comment lol
@@ -16,7 +16,8 @@ pub fn shell() {
             continue;
         }
         let command: &str = input.trim(); // saves the readed line of the input
-        if command == "exit" { //built-in exit command
+        if command == "exit" {
+            //built-in exit command
             break;
         }
         handler::handle(command); // sends the saved command to the handler

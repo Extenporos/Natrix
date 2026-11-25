@@ -1,9 +1,8 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use std::path::PathBuf;
 
 pub fn natrix_dir() -> Result<PathBuf> {
-    let home = dirs::home_dir()
-        .ok_or_else(|| anyhow!("could not determine the home directory"))?;
+    let home = dirs::home_dir().ok_or_else(|| anyhow!("could not determine the home directory"))?;
 
     Ok(home.join(".natrix"))
 }
